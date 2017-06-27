@@ -61,17 +61,21 @@ router.post( '/update_settings', function( req, res, next ) {
 });
 
 router.post( '/CheckTriggers', function( req, res, next ) {
-    var params = req.body.parameters;
-    var user   = params.userid;
-    var resp = {status: "Success", results: {}};
-    if (user.match(/joan/i)) {
-        resp = {status: "Success", results: {insighttrigger: "low_balance"}}
-    } else if (user.match(/john/i)) {
-        resp = {status: "Success", results: {insighttrigger: "excess_balance"}}
-    } else if (user.match(/amy/i)) {
-        resp = {status: "Success", results: {insighttrigger: "atm_fee"}}
+    var params      = req.body.parameters;
+    var user        = params.userid;
+    var resp        = {status: "Success", results: {}};
+    var settings    = JSON.parse( Util.readFile( "sage_settings.json" ));
+    var minPriority = 1000;
+    var minSetting  = {};
+    settings.forEach(function(stg) {
+        if (stg.priority < minPriority) {
+            minSetting  = stg;
+            minPriority = stg.priority;
+        }
+    });
+    if ('priority' in minSetting) {
+        resp = {status: "Success", results: {insighttrigger: minSetting.code}}
     }
-    // var settings = JSON.parse( Util.readFile( "sage_settings.json" ));
     return res.send( resp );
 });
 
