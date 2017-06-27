@@ -64,7 +64,7 @@
                     controller: 'sageJourneyEditCtrl'
                 })
                 .otherwise({
-                    redirectTo: '/home'
+                    redirectTo: '/sage/insights_toggle'
                 });
         }
     ]);
