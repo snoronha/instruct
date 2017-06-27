@@ -1,0 +1,22 @@
+{
+    "description": [
+        "You are given an array of integers of size N. Can you find the sum of the elements in the array?",
+        "<p><b>Input</b><br/>",
+        "The first line of input consists of an integer N. The next line contains N space-separated integers representing the array elements.<br/></p>",
+        "<p>Sample: <br/>",
+        "6<br/>",
+        "1 2 3 4 10 11<br/></p>",
+        "<p><b>Output</b><br/",
+        "Output a single value equal to the sum of the elements in the array.<br/>",
+        "For the sample please print 31 as 1 + 2 + 3 + 4 +10 +11 = 31."
+    ],
+    "input": [
+        "6",
+        "1 2 3 4 10 11"
+    ],
+    "output": [
+        "31"
+    ]
+}
+    
+    

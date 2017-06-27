@@ -1,0 +1,41 @@
+<header-general></header-general>
+
+<div class="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+  <form>
+    <h3 class="text-center">Personal Information</h3>
+    <div class="progress">
+      <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar"
+           aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="width: 33%">
+        <span class="sr-only">33% Complete</span>
+      </div>
+    </div>
+    <div class="form-group">
+	  <label for="fullname">Full Name</label>
+	  <input type="text" class="form-control" ng-model="user.full_name" placeholder="Enter Full Name">
+    </div>
+    <div class="form-group">
+	  <label for="phone_number">Phone Number</label>
+	  <input type="tel" class="form-control" ng-model="user.phone_number" placeholder="Enter Phone Number">
+    </div>
+    <div class="form-group">
+	  <label for="phone_number">Date of BirthPhone Number</label>
+	  <input type="date" class="form-control" ng-model="user.dob">
+    </div>
+    <div class="form-group">
+	  <label for="message_pref">Message Preference</label>
+	  <select class="form-control">
+	    <option value="email">Email</option>
+	    <option value="sms">SMS</option>
+	    <option value="phone">Phone Call</option>
+	  </select>
+    </div>
+    <div class="form-group">
+	  <label for="allergies">Allergies</label>
+	  <textarea class="form-control" rows="3" ng-model="user.allergies" placeholder="Allergies"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary btn-lg col-xs-12 col-sm-12 col-md-12"
+	        ng-click="updatePersonalInfo()">
+	  Go to Payment Information
+    </button>
+  </form>
+</div>

@@ -1,0 +1,32 @@
+{
+    "name": "coderrank-app",
+    "version": "1.0.0",
+    "description": "CoderRank",
+    "private": true,
+    "dependencies": {
+        "angular": "1.5.9",
+        "angular-resource": "1.5.9",
+        "angular-route": "1.5.9",
+        "angular-sanitize": "1.5.9",        
+        "angular-touch": "1.5.9",
+        "angular-animate": "1.5.9",
+        "angular-aria": "1.5.9",
+        "angular-cookies": "1.5.9",
+        "angular-material": "1.1.1",
+        "angular-messages": "1.5.9",
+        "angular-ui-bootstrap": "2.3.0",
+        "ace-builds": "1.2.5",
+        "jquery": "3.1.1",
+        "jsplumb": "2.2.10"
+    },
+    "devDependencies": {
+        "grunt": "1.0.1",
+        "grunt-preprocess": "5.1.0",
+        "grunt-shell": "2.1.0",
+        "grunt-contrib-concat": "1.0.1",
+        "grunt-contrib-cssmin": "1.0.2",
+        "grunt-contrib-less": "1.4.0",
+        "grunt-contrib-uglify": "2.1.0"
+    }
+}
+

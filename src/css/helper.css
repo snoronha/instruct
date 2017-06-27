@@ -1,0 +1,50 @@
+.fullImage {
+    background: url('/images/1920-x-1080.jpg') no-repeat center center fixed;
+    opacity: 0.3;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.small-text {
+    font-size: 10px;
+}
+
+.site-sidenav,
+.site-sidenav.md-locked-open-add-active,
+.site-sidenav.md-locked-open {
+    width:     224px;
+    min-width: 224px;
+    max-width: 224px;
+}
+.site-sidenav > * {
+    min-width: 218px;
+}
+
+/* Global View animations */
+.view-animate {
+    /* padding:10px; */
+}
+
+.view-animate.ng-enter, .view-animate.ng-leave {
+    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.25s;
+
+    display:block;
+    width:100%;
+
+    position:absolute;
+    top:0; left:0; right:0; bottom:0;
+    /* padding:10px; */
+                       
+}
+
+.view-animate.ng-enter {
+    left:100%;
+}
+.view-animate.ng-enter.ng-enter-active {
+    left:0;
+}
+.view-animate.ng-leave.ng-leave-active {
+    left:-100%;
+}

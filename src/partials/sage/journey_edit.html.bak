@@ -1,0 +1,13 @@
+<section layout="row" flex id="popupContainer">
+
+  <md-content flex="100" layout-padding>
+
+    <md-header class="md-no-sticky">Journey Editor</md-header>
+
+    <div data-demo-id="flowchart">
+      <div class="jtk-demo-canvas canvas-wide flowchart-demo jtk-surface jtk-surface-nopan" id="canvas"></div>
+    </div>
+
+  </md-content>
+
+</section>

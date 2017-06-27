@@ -1,0 +1,38 @@
+<header-general></header-general>
+
+<section layout="row" flex id="popupContainer">
+  
+  <md-content flex-offset="15" flex="70" layout-padding>
+    <div>
+      <form name="userForm">
+        <div layout-gt-xs="row">
+          <md-input-container class="md-block" flex-gt-xs>
+            <label>Email Address</label>
+            <input ng-model="user.email_address">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <md-input-container class="md-block" flex-gt-sm>
+            <label>Password</label>
+            <input type="password" ng-model="user.password">
+          </md-input-container>
+        </div>
+        <div layout-gt-sm="row">
+          <button class="md-raised md-primary md-button md-ink-ripple" type="button"
+                  aria-label="Button" flex="50" flex-offset="25">
+            <span class="ng-scope">Login</span>
+            <div class="md-ripple-container"></div>
+          </button>
+        </div>
+      </form>
+
+      <div layout="row" layout-align="center center" flex="100">
+        No login? <md-button ng-href="#/register">Register</md-button>
+      </div>
+
+    </div>
+  </md-content>
+
+</section>
+
+

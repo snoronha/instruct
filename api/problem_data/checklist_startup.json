@@ -1,0 +1,106 @@
+{
+    "team": {
+	"Team": [
+            "Is it an A+ team?",
+	    "Does team have relevant experience?",
+	    "Is team complete?",
+	    "Can this team hire people?",
+	    "Is this team colocated?",
+	    "Is team located in same place as primary market?",
+	    "Will you have to hire CEO?",
+	    "Is team committed to working full time on this?",
+	    "Reference check on the team?",
+	    "Is their a prior relationship with team?",
+	    "Gaps in Founding team?",
+	    "Quality of hired team",
+	    "Churn in team",
+	    "Glass door rating of team",
+	    "Is team motivated by personal reasons?",
+	    "Passion of the team? - High",
+	    "Do you believe in values of the team?",
+	    "Will this team be agile?",
+	    "Can this team scale as company grows?"
+	]
+    },
+    "market": {
+	"Market": [
+            "What is the size of total market?",
+	    "What is the size of addressable market with current offering?",
+	    "Is product/company dependent on some other (few)  companies?",
+	    "Existing market vs New market",
+	    "Competitors - Inhouse people?",
+	    "Competitors - Boutinque firms?",
+	    "Competitors - well funded startups?",
+	    "Competitors - Large companies?",
+	    "Anti Market - Who will loose if you succeed?",
+	    "Anti Market - What can be negative positioning around this company?",
+	    "Are there tail winds supporting this?",
+	    "Are there headwinds that will deter this company?"
+	]
+    },
+    "exit": {
+	"Exit": [
+            "Can this be an independent company?",
+	    "Public company - Can this go public?",
+	    "Public Company - Is revenue going to be predictable?",
+	    "Public Company - Is revenue going to be lumpy?",
+	    "Does this fit in the vision of large companies?",
+	    "Can you see this getting acquired by a large company",
+	    "Can this exit just for talent?",
+	    "Can this exit just for technology/product?"
+	]
+    },
+    "product": {
+	"Product": [
+	    "Is this solving a real need?",
+	    "Is this better done as a feature of existing product?",
+	    "Is integration complex?",
+	    "Can it be tried easily?",
+	    "Does It require critical mass to succeed?",
+	    "Is product simple to explain?",
+	    "Can \"anyone\" sell this product or requires special skill set to sell?",
+	    "Will this meaningfully change the world?",
+	    "Can you test the idea easily?",
+	    "Will you be proud to be associated with this company?",
+	    "Are you passionate about the end-game?"
+	]
+    },
+    "go-to-market": {
+	"Go-to-Market": [
+	    "Is their virality associated with this?",
+	    "Can you build community around it?",
+	    "Who is the buyer?",
+	    "Is buyer same as user?",
+	    "Will purchase of this product require lot of approvals?",
+	    "Is it an ad-supported product?",
+	    "Is pricing in line with value prop of the product?",
+	    "Will agencies be interested in selling this/Channel partnership opportunities?"
+	]
+    },
+    "valuation": {
+	"Valuation": [
+	    "In line with stage of the company?",
+	    "In line with public market valuations?",
+	    "In line with similar companies that got funded?"
+	],
+	"Unit Economics": [
+	    "What is cost of customer acquisition",
+	    "What is cost of serving customer",
+	    "What is LTV of customer?",
+	    "What is cost of goods sold?",
+	    "Will it require services team to retain customer?",
+	    "Is expected churn high or low?"
+	]
+    },
+    "other": {
+	"Regulatory/Data Privacy": [
+	    "re there regulations that you will have to fight?",
+	    "Do you have to comply with FTC/HIPAA"
+	],
+	"Timing": [
+	    "Why now?",
+	    "Will it be too late if you wait for 2 years to start this?"
+	]
+    }
+	
+}

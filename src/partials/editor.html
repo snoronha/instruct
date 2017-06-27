@@ -1,0 +1,147 @@
+<header-general></header-general>
+
+<div layout="row" ng-cloak>
+
+
+  <md-content flex-offset="5" flex="90" layout-padding>
+    
+    <md-tabs md-dynamic-height md-border-bottom>
+
+      <!-- Problem Tab -->
+      <md-tab label="problem" md-on-select="changeTab('problem'); initEditor();"
+              md-active="! editorSettings.tab || editorSettings.tab === 'problem'">
+
+        <!-- Problem statement, if problem exists -->
+        <div layout="row">
+          <div flex="100" ng-if="editorSettings.problem" ng-bind-html="editorSettings.problem.description"></div>
+        </div>
+        
+        <div layout="row">
+
+          <md-input-container flex="100" class="md-block">
+
+            <!-- menu for editor -->
+            <md-toolbar class="md-menu-toolbar" flex="100" layout-align="end end"
+                        style="min-height: 40px; border: 1px solid #f0f0f0;">
+
+              <md-menu-bar style="padding: 0;">
+                <md-menu>
+                  <button ng-click="$mdOpenMenu()">Editor</button>
+                  <md-menu-content >
+                    <md-menu-item ng-repeat="ed in [{n:'Text',v:'text'},{n:'Vim',v:'vim'},{n:'Emacs',v:'emacs'}]"
+                                  class="md-indent">
+                      <md-icon md-svg-icon="forward" ng-if="ed.v == editorSettings.editor"></md-icon>
+                      <md-button ng-click="setEditor( ed.v )">{{ed.n}}</md-button>
+                    </md-menu-item>
+                  </md-menu-content>
+                </md-menu>
+
+                <md-menu>
+                  <button ng-click="$mdOpenMenu()">Language</button>
+                  <md-menu-content >
+                    <md-menu-item class="md-indent"
+                                  ng-repeat="lang in [{n:'C++',v:'c++'},{n:'Ruby',v:'ruby'},
+                                             {n:'Javascript',v:'javascript'},{n:'PHP',v:'php'},
+                                             {n:'Python',v:'python'}]">
+                      <md-icon md-svg-icon="forward" ng-if="lang.v == editorSettings.language"></md-icon>
+                      <md-button ng-click="setLanguage( lang.v )">{{lang.n}}</md-button>
+                    </md-menu-item>
+                  </md-menu-content>
+                </md-menu>
+              </md-menu-bar>
+            </md-toolbar>
+
+            <md-content flex>
+              <!-- editor container -->
+              <div layout="column" layout-align="top center">
+                <div id="editor" layout-fill style="border: 1px solid #fafafa;"></div>
+              </div>
+
+              <md-sidenav class="md-sidenav-right md-whiteframe-z2" md-component-id="right"
+                          style="width: 1000px; max-width: 60%;">
+                <md-content layout-padding>
+                  
+                  <div layout="row" flex="100" layout-align="center center">
+                    <md-input-container flex="100" class="md-block" flex-gt-xs style="border: 1px solid #f0f0f0;">
+                      <md-progress-linear flex="100" md-mode="indeterminate" ng-if="editorSettings.busy"
+                                          style="position: absolute; z-index: 1;">
+                      </md-progress-linear>
+                      <!-- stdout container -->
+                      <div id="stdout" flex="100" style="z-index: 0;"></div>
+                    </md-input-container>
+                  </div>
+                  
+                </md-content>
+              </md-sidenav>
+              
+            </md-content>
+          </md-input-container>
+        </div>
+        
+        
+        <div layout="row" flex="100" layout-align="center center">
+          <button class="md-raised md-basic md-button" type="button"
+                  md-ink-ripple="#033333" aria-label="Button"
+                  ng-click="openRight(); submitCode();">
+            <span>Run Code</span>
+          </button>
+          <md-button class="md-raised md-primary" ng-click="submitCode()">
+            <span>Submit</span>
+          </md-button>
+        </div>
+
+      </md-tab>
+      
+
+      <md-tab label="submissions" md-on-select="changeTab('submissions');"
+              md-active="editorSettings.tab === 'submissions'">
+        <md-content class="md-padding">
+          <h2>Submissions</h2>
+
+          <md-list>
+            <md-list-item layout="row" flex="100">
+              <div flex="30">Problem</div>
+              <div hide show-gt-xs flex="15">Language</div>
+              <div hide show-gt-xs flex="15">Time</div>
+              <div flex="15">Result</div>
+              <div hide show-gt-xs flex="10">Score</div>
+              <div flex><span layout="row" layout-align="center center">View</span></div>
+            </md-list-item>
+            <md-divider></md-divider>
+            <md-list-item layout="row"
+                          ng-repeat="topping in [{name: 'Dijkstra\'s Shorted Path'}, {name: 'Heap Sort'}]">
+              <div flex="30">{{ topping.name }} </div>
+              <div hide show-gt-xs flex="15">Javascript</div>
+              <div hide show-gt-xs flex="15">3 days ago</div>
+              <div flex="15">Accepted</div>
+              <div hide show-gt-xs flex="10">5.0</div>
+              <div flex>
+                <md-button layout="row" layout-align="center center">View</md-button>
+              </div>
+            </md-list-item>
+            <md-divider></md-divider>
+          </md-list>
+
+        </md-content>
+      </md-tab>
+
+      <md-tab label="discussions" md-on-select="changeTab('discussions');"
+              md-active="editorSettings.tab === 'discussions'">
+        <md-content class="md-padding">
+          <h1 class="md-display-2">Disussions</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue. Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies mi.</p>
+        </md-content>
+      </md-tab>
+
+      <md-tab label="learn" md-on-select="changeTab('learn');" md-active="editorSettings.tab === 'learn'">
+        <md-content class="md-padding">
+          <h1 class="md-display-2">Learn</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla venenatis ante augue. Phasellus volutpat neque ac dui mattis vulputate. Etiam consequat aliquam cursus. In sodales pretium ultrices. Maecenas lectus est, sollicitudin consectetur felis nec, feugiat ultricies mi.</p>
+        </md-content>
+      </md-tab>
+      
+    </md-tabs>
+  </md-content>
+      
+</div>
+

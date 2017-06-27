@@ -1,0 +1,20 @@
+{
+    "description": [
+        "Find the Parity of a number. The Parity of a number is 1 if the binary representation has an odd number of 1's and 0 if the number of 1's is even. You input is the decimal representation of the number.",
+        "<p><b>Input</b><br/>",
+        "First Line: decimal representation of the number.<br/></p>",
+        "<p>Sample: <br/>",
+        "15<br/></p>",
+        "<p><b>Output</b><br/",
+        "Output a single value equal to the parity of the number.<br/>",
+        "For the sample above please print 0 because Parity( 15 (decimal) ) = Parity( 1111 ) = 0."
+    ],
+    "input": [
+        "15"
+    ],
+    "output": [
+        "0"
+    ]
+}
+    
+    

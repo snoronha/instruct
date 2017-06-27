@@ -1,0 +1,6 @@
+[
+    { "name": "Low Balance", "priority": 3, "enabled": true },
+    { "name": "Multiple Mortgage Payments", "priority": 2, "enabled": false },
+    { "name": "Login Problems", "priority": 2, "enabled": false },
+    { "name": "Excess Balance", "priority": 2, "enabled": false }
+]

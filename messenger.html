@@ -1,0 +1,40 @@
+<html>
+  <script>
+    window.fbAsyncInit = function() {
+    	FB.init({ 
+	    appId: '1748781152068659',
+	    status: true, 
+	    cookie: true, 
+	    xfbml: true,
+	    version: 'v2.5'
+	});
+    };
+
+
+    (function(d, s, id){
+	var js, fjs = d.getElementsByTagName(s)[0];
+	if (d.getElementById(id)) {return;}
+	js = d.createElement(s); js.id = id;
+	js.src = "//connect.facebook.net/en_US/sdk.js";
+	fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function onload() {
+	console.log("Loaded:", FB.AppEvents.EventNames);
+    }
+    
+</script>
+
+
+  <body onload="onload()">
+    <div id="fb-root"></div>
+
+    <div style="height: 1000px;" flex="100">
+      <div class="fb-send"
+	   data-href="https://www.inksedge.com/"
+	   data-layout="button_count">
+      </div>
+    </div>
+  </body>
+
+</html>

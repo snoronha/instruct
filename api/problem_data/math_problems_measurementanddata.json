@@ -1,0 +1,34 @@
+[
+    {
+        "question": [
+            { "text": "It took a cheetah 45 minutes to run from Jungle A to Jungle B. The average speed for the trip was 80 km/h. Find the distance between the two jungles." }
+        ],
+        "answer": [
+            { "field": "Hint: Distance = Speed \\times Time" }
+        ]
+    },
+    {
+        "question": [
+            { "text": "A boat heads south at 1,200 mph while a steamer heads east at 500 mph. If they started from the same dock and at the same time, when will the distance between them be 1,300 mi?" }
+        ],
+        "answer": [
+            { "field": "Hint:\\ Use\\ Pythagoras'\\ theorem" }
+        ]
+    },
+    {
+        "question": [
+            { "text": "Bob is hiking down a 60-mile country trail. He could hike at 10 mph for the first two hours and then go the rest of the way at 30 mph or he could just go the whole way at 20 mph. Which option is the faster?" }
+        ],
+        "answer": [
+            { "field": "Hint:\\ Time = \\frac{Distance}{Speed}" }
+        ]
+    },
+    {
+        "question": [
+            { "text": "The distance between two cities is 145 miles. A truck can cover this distance in 2.5 hours. The speed of a car is 1.5 times faster than the speed of the truck. How long does it take them to meet, if they start moving towards each other simultaneously?" }
+        ],
+        "answer": [
+            { "field": "Hint:\\ Distance = (Speed_c_a_r \\times Time_c_a_r) + (Speed_t_r_u_c_k \\times Time_t_r_u_c_k)" }
+        ]
+    }
+]

@@ -1,0 +1,22 @@
+{
+    "description": [
+        "Partition an array containing 3 values, say 0, 1 and 2 about a pivot value (say 1).",
+        "<p><b>Input</b><br/>",
+        "First Line: number of elements in array, n<br/>",
+        "Second Line: n space-separated numbers with 3 distinct values.<br/></p>",
+        "<p>Sample: <br/>",
+        "15<br/>",
+        "0 1 2 1 2 1 2 1 2 1 0 0 1 2 1<br/></p>",
+        "<p><b>Output</b><br/>",
+        "Output space-separated values with pivot element values between the extreme values.<br/>",
+        "For the sample above: 0 0 0 1 1 1 1 1 1 1 2 2 2 2 2</p>"
+    ],
+    "input": [
+        "15\n0 1 2 1 2 1 2 1 2 1 0 0 1 2 1"
+    ],
+    "output": [
+        "0 0 0 1 1 1 1 1 1 1 2 2 2 2 2"
+    ]
+}
+    
+    

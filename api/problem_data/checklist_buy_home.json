@@ -1,0 +1,92 @@
+{
+    "home details": {
+	"Home Details": [
+	    "Square footage",
+	    "Number of bedrooms",
+	    "Number of baths",
+	    "Practicality of floorplan",
+	    "Interior walls condition",
+	    "Closet/storage space",
+	    "Basement",
+	    "Fireplace",
+	    "Cable TV",
+	    "Basement: dampness or odors",
+	    "Exterior appearance, condition",
+	    "Lawn/yard space",
+	    "Fence",
+	    "Patio or deck",
+	    "Garage",
+	    "Energy efficiency",
+	    "Screens, storm windows",
+	    "Roof: age and condition",
+	    "Gutters and downspouts"
+	]
+    },
+    "neighborhood details": {
+	"Neighborhood Details": [
+	    "Appearance/condition of nearby",
+	    "Homes/Businesses",
+	    "Traffic",
+	    "Noise Level",
+	    "Safety/Security",
+	    "Age mix of inhabitants",
+	    "Number of children",
+	    "Pet restrictions",
+	    "Parking - is there enough parking space for guests",
+	    "Zoning regulations",
+	    "Neighborhood restrictions",
+	    "covenants",
+	    "Fire protection",
+	    "Police",
+	    "Snow removal",
+	    "Garbage service",
+	    "Are there powerlines next to home"
+	]
+    },
+    "school details": {
+	"School Details": [
+	    "Age/condition",
+	    "Reputation",
+	    "Quality of teachers",
+	    "Achievement test scores",
+	    "Play areas",
+	    "Curriculum",
+	    "Class size",
+	    "Busing distance"
+	]
+    },
+    "convenience to": {
+	"Convenience to": [
+	    "Supermarket",
+	    "Schools",
+	    "Work",
+	    "Shopping",
+	    "Child care",
+	    "Hospitals",
+	    "Doctor/dentist",
+	    "Recreation/parks",
+	    "Restaurants/entertainment",
+	    "Church/synagogue",
+	    "Airport",
+	    "Highways",
+	    "Public transportation"
+	]
+    },
+    "offer/negotiation": {
+	"Offer/Negotiation": [
+	    "Bid Smartly",
+	    "Make clear demands",
+	    "Use closing date as a negotiating point",
+	    "Ask the seller to buy a home warranty"
+	]
+    },
+    "mortgage": {
+	"Mortgage": [
+	    "Ask for Referrals",
+	    "Calculate your down payment",
+	    "Quotes from multiple lenders",
+	    "Do you want to pay points to lower rate?",
+	    "Do you qualify for special loan such as VA, FHA, HUD etc."
+	]
+    }
+}

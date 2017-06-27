@@ -1,0 +1,37 @@
+[
+    {
+        "question": [
+            { "text": "Mrs. Wise bought 3 lb of apples at $4 per lb. The following day there was 20% discount so she bought another 5 lb. What was the average price for all apples she bought?" }
+        ],
+        "answer": [
+            { "field": "Hint:\\ Total = 3\\times4+0.8(5\\times4)" }
+        ]
+    },
+    {
+        "question": [
+            { "text": "Write as a fraction and reduce, if possible: " },
+            { "static": "\\frac{a}{b}+\\frac{a}{2b}" }
+        ],
+        "answer": [
+            { "field": "Hint:\\ \\frac{a}{b}+\\frac{a}{2b}=\\frac{(2a+a)}{2b}" }
+        ]
+    },
+    {
+        "question": [
+            { "text": "Write as a fraction and reduce, if possible: " },
+            { "static": "\\frac{1}{5d}-\\frac{c}{d^2}" }
+        ],
+        "answer": [
+            { "field": "Hint:\\ \\frac{1}{5d}-\\frac{c}{d^2}=\\frac{(d-5c)}{5d^2}" }
+        ]
+    },
+    {
+        "question": [
+            { "text": "Find the set of the solutions for each of the following Absolute Value Inequalities. Check your answers. " },
+            { "static": "|1-\\frac{3}{4}k|\\ge7" }
+        ],
+        "answer": [
+            { "field": "Hint:\\ try\\ (1-\\frac{3}{4}k)\\ and\\ -(1-\\frac{3}{4}k)" }
+        ]
+    }
+]
