@@ -114,7 +114,7 @@ module.exports = function( grunt ) {
             "src/css/jsplumb/jsPlumbToolkit-defaults.css",
             "src/css/jsplumb/main.css",
             "src/css/jsplumb/jsPlumbToolkit-demo.css",
-            "src/css/jsplumb/demo_flowchart.css",
+            "src/css/jsplumb/flowchart.css",
             
             "src/css/helper.css",
         ],

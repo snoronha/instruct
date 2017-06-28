@@ -1,14 +1,13 @@
 (function (window, angular, undefined) {
 
     angular.module( 'coderControllers' ).controller( 'sageJourneyEditCtrl', [
-        '$scope', '$location', '$routeParams', '$log', '$mdDialog', '$mdSidenav', 'Sage',
-        function( $scope, $location, $routeParams, $log, $mdDialog, $mdSidenav, Sage ) {
+        '$scope', '$location', '$routeParams', '$log', '$timeout', '$mdDialog', '$mdSidenav', 'Sage',
+        function( $scope, $location, $routeParams, $log, $timeout, $mdDialog, $mdSidenav, Sage ) {
 
             $log.log( "loaded sageJourneyEditCtrl ..." );
 
             $scope.leftClose = function () {
                 // Component lookup should always be available since we are not using `ng-if`
-                $log.log("IN HERE ...");
                 $mdSidenav('left').close()
                     .then(function () {
                         $log.debug("close LEFT is done");
@@ -17,6 +16,10 @@
 
             jsPlumb.ready(function () {
 
+                var STATES = {};
+                var EDGES  = {};
+                var outerWindowNumber = 0;
+                
                 var instance = window.jsp = jsPlumb.getInstance({
                     // default drag options
                     DragOptions: { cursor: 'pointer', zIndex: 2000 },
@@ -46,6 +49,45 @@
                     Container: "canvas"
                 });
 
+
+                $scope.createCondition = function () {
+                    //--- create new node with children for conditions ---//
+                    var numBoxes = 3;
+                    var child_nodes = {};
+                    for (var i = 0; i < numBoxes; i++) {
+                        child_nodes[i] = { id: outerWindowNumber + "_" + i, text: "Insert condition here" };
+                    }
+                    STATES[outerWindowNumber] = { type: 'Condition', child_nodes: child_nodes };
+                    
+                    //--- create outerWindow + innerWindow[numBoxes] ---///
+                    var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
+                    var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\">" +
+                        "<div class=\"outer-window-header\"> Window " + outerWindowNumber + "</div>";
+                    for (var i = 0; i < numBoxes; i++) {
+                        var child_node = STATES[outerWindowNumber].child_nodes[i];
+                        html += "<div class=\"inner-window col-md-1\" id=\"innerflowchartWindow_" + child_node.id + "\">" + child_node.text + "</div>";
+                    }
+                    html += "</div>";
+                    $log.log("Appending: ", html);
+                    $("#canvas").append(html);
+
+                    $timeout(
+                        function() {
+                            //--- add endpoints for outerWindow and innerWindows ---//
+                            _addEndpoints("outerflowchartWindow_" + outerWindowNumber, [], ["TopCenter"]);
+                            for (var i = 0; i < numBoxes; i++) {
+                                var child_node = STATES[outerWindowNumber].child_nodes[i];
+                                _addEndpoints("innerflowchartWindow_" + child_node.id, ["BottomCenter"], []);
+                            }
+                            
+                            //--- force outer-windows to be draggable ---//
+                            instance.draggable(jsPlumb.getSelector(".flowchart-demo .outer-window"), { grid: [20, 20] }); 
+                        
+                            outerWindowNumber++;
+                        }, 100
+                    );
+                };
+                
                 var basicType = {
                     connector: "StateMachine",
                     paintStyle: { stroke: "red", strokeWidth: 4 },
@@ -118,47 +160,113 @@
                 var _addEndpoints = function (toId, sourceAnchors, targetAnchors) {
                     for (var i = 0; i < sourceAnchors.length; i++) {
                         var sourceUUID = toId + sourceAnchors[i];
-                        instance.addEndpoint("flowchart" + toId, sourceEndpoint, {
+                        instance.addEndpoint(toId, sourceEndpoint, {
                             anchor: sourceAnchors[i], uuid: sourceUUID
                         });
                     }
                     for (var j = 0; j < targetAnchors.length; j++) {
                         var targetUUID = toId + targetAnchors[j];
-                        instance.addEndpoint("flowchart" + toId, targetEndpoint, { anchor: targetAnchors[j], uuid: targetUUID });
+                        instance.addEndpoint(toId, targetEndpoint, { anchor: targetAnchors[j], uuid: targetUUID });
                     }
                 };
 
                 // suspend drawing and initialise.
                 instance.batch(function () {
 
-                    _addEndpoints("Window4", ["TopCenter", "BottomCenter"], ["LeftMiddle", "RightMiddle"]);
-                    _addEndpoints("Window2", ["LeftMiddle", "BottomCenter"], ["TopCenter", "RightMiddle"]);
-                    _addEndpoints("Window3", ["RightMiddle", "BottomCenter"], ["LeftMiddle", "TopCenter"]);
-                    _addEndpoints("Window1", ["LeftMiddle", "RightMiddle"], ["TopCenter", "BottomCenter"]);
-
-                    // listen for new connections; initialise them the same way we initialise the connections at startup.
+                    //--- listen for new connections; initialise them as at startup, create an edge if necessary ---//
                     instance.bind("connection", function (connInfo, originalEvent) {
                         init(connInfo.connection);
+                        var sourceNode, targetNode, innerMatch, outerMatch;
+                        innerMatch = connInfo.sourceId.match(/Window_(\d+)_(\d+)$/);
+                        outerMatch = connInfo.sourceId.match(/Window_(\d+)$/);
+                        if (innerMatch) {
+                            sourceNode = { id: innerMatch[1] + '_' + innerMatch[2], dom_id: connInfo.sourceId };
+                        } else if (outerMatch) {
+                            sourceNode = { id: outerMatch[1], dom_id: connInfo.sourceId };
+                        }
+
+                        innerMatch = connInfo.targetId.match(/Window_(\d+)_(\d+)$/);
+                        outerMatch = connInfo.targetId.match(/Window_(\d+)$/);
+                        if (innerMatch) {
+                            targetNode = { id: innerMatch[1] + '_' + innerMatch[2], dom_id: connInfo.targetId };
+                        } else if (outerMatch) {
+                            targetNode = { id: outerMatch[1], dom_id: connInfo.targetId };
+                        }
+
+                        //--- create an edge ---//
+                        if (sourceNode && targetNode) {
+                            if (!EDGES[sourceNode.id]) EDGES[sourceNode.id] = {};
+                            if (!EDGES[sourceNode.id][targetNode.id]) EDGES[sourceNode.id][targetNode.id] = {};
+                            EDGES[sourceNode.id][targetNode.id] = {dom_source_id: sourceNode.dom_id, dom_target_id: targetNode.dom_id};
+                        }
+                        console.log("connection - edges: ", EDGES);
                     });
 
+                    //--- listen for detached connections; delete the edge ---//
+                    instance.bind("connectionDetached", function (connInfo, originalEvent) {
+                        var sourceNode, targetNode, innerMatch, outerMatch;
+                        innerMatch = connInfo.sourceId.match(/Window_(\d+)_(\d+)$/);
+                        outerMatch = connInfo.sourceId.match(/Window_(\d+)$/);
+                        if (innerMatch) {
+                            sourceNode = { id: innerMatch[1] + '_' + innerMatch[2] };
+                        } else if (outerMatch) {
+                            sourceNode = { id: outerMatch[1] };
+                        }
+
+                        innerMatch = connInfo.targetId.match(/Window_(\d+)_(\d+)$/);
+                        outerMatch = connInfo.targetId.match(/Window_(\d+)$/);
+                        if (innerMatch) {
+                            targetNode = { id: innerMatch[1] + '_' + innerMatch[2] };
+                        } else if (outerMatch) {
+                            targetNode = { id: outerMatch[1] };
+                        }
+
+                        //--- delete edge ---//
+                        if (sourceNode && targetNode) {
+                            if (EDGES[sourceNode.id][targetNode.id]) {
+                                delete EDGES[sourceNode.id][targetNode.id];
+                                if (Object.keys(EDGES[sourceNode.id]).length == 0) {
+                                    delete EDGES[sourceNode.id];
+                                }
+                            }
+                        }
+                        $log.log("detached - edges: ", EDGES);
+                    });
+
+                    //--- listen for moved connections; delete edge from originalSourceId ---//
+                    instance.bind("connectionMoved", function (connInfo, originalEvent) {
+                        var sourceId, targetId, sourceNode, targetNode, innerMatch, outerMatch;
+                        innerMatch = connInfo.originalSourceId.match(/Window_(\d+)_(\d+)$/); // delete edge from original source/target
+                        outerMatch = connInfo.originalSourceId.match(/Window_(\d+)$/);
+                        if (innerMatch) {
+                            sourceNode = { id: innerMatch[1] + '_' + innerMatch[2] };
+                        } else if (outerMatch) {
+                            sourceNode = { id: outerMatch[1] };
+                        }
+
+                        innerMatch = connInfo.originalTargetId.match(/Window_(\d+)_(\d+)$/);
+                        outerMatch = connInfo.originalTargetId.match(/Window_(\d+)$/);
+                        if (innerMatch) {
+                            targetNode = { id: innerMatch[1] + '_' + innerMatch[2] };
+                        } else if (outerMatch) {
+                            targetNode = { id: outerMatch[1] };
+                        }
+
+                        if (sourceNode && targetNode) {
+                            if (EDGES[sourceNode.id][targetNode.id]) {
+                                delete EDGES[sourceNode.id][targetNode.id];
+                                if (Object.keys(EDGES[sourceNode.id]).length == 0) {
+                                    delete EDGES[sourceNode.id];
+                                }
+                            }
+                        }
+                        console.log("moved - edges: ", EDGES);
+                    });
+                    
                     // make all the window divs draggable
-                    instance.draggable(jsPlumb.getSelector(".flowchart-demo .window"), { grid: [20, 20] });
-                    // THIS DEMO ONLY USES getSelector FOR CONVENIENCE. Use your library's appropriate selector
-                    // method, or document.querySelectorAll:
-                    //jsPlumb.draggable(document.querySelectorAll(".window"), { grid: [20, 20] });
+                    instance.draggable(jsPlumb.getSelector(".flowchart-demo .outer-window"), { grid: [20, 20] });
 
-                    // connect a few up
-                    instance.connect({uuids: ["Window2BottomCenter", "Window3TopCenter"], editable: true});
-                    instance.connect({uuids: ["Window2LeftMiddle", "Window4LeftMiddle"], editable: true});
-                    instance.connect({uuids: ["Window4TopCenter", "Window4RightMiddle"], editable: true});
-                    instance.connect({uuids: ["Window3RightMiddle", "Window2RightMiddle"], editable: true});
-                    instance.connect({uuids: ["Window4BottomCenter", "Window1TopCenter"], editable: true});
-                    instance.connect({uuids: ["Window3BottomCenter", "Window1BottomCenter"], editable: true});
-                    //
-
-                    //
-                    // listen for clicks on connections, and offer to delete connections on click.
-                    //
+                    //--- listen for clicks on connections ---//
                     instance.bind("click", function (conn, originalEvent) {
                         // if (confirm("Delete connection from " + conn.sourceId + " to " + conn.targetId + "?"))
                         //   instance.detach(conn);
@@ -166,16 +274,14 @@
                     });
 
                     instance.bind("connectionDrag", function (connection) {
-                        console.log("connection " + connection.id + " is being dragged. suspendedElement is ", connection.suspendedElement, " of type ", connection.suspendedElementType);
+                        // $log.log("connection " + connection.id + " is being dragged. suspendedElement is ", connection.suspendedElement,
+                        // " of type ", connection.suspendedElementType);
                     });
 
                     instance.bind("connectionDragStop", function (connection) {
-                        console.log("connection " + connection.id + " was dragged");
+                        // $log.log("connection " + connection.id + " was dragged");
                     });
-
-                    instance.bind("connectionMoved", function (params) {
-                        console.log("connection " + params.connection.id + " was moved");
-                    });
+                    
                 });
 
                 jsPlumb.fire("jsPlumbDemoLoaded", instance);

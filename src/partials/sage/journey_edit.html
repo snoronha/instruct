@@ -3,29 +3,25 @@
    nav-bar-aria-label="navigation links">
   <md-nav-item  name="SageInc">Sage Inc</md-nav-item>
 </md-nav-bar>
-<section layout="row" flex> 
+<section layout="row" flex data-demo-id="flowchart"> 
   <md-sidenav class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-sm')" md-whiteframe="2">
     <md-toolbar class="md-theme-indigo">
       <h1 class="md-toolbar-tools">Sidenav Left</h1>
     </md-toolbar>
     <md-content layout-padding>
-      <md-button ng-click="leftClose()" class="md-primary" hide-gt-md>
-        Close Sidenav Left
+      <md-button ng-click="createCondition()" class="md-primary" hide-gt-md>
+        Condition
       </md-button>
-      <p hide show-gt-md>
-        This sidenav is locked open on your device. To go back to the default behavior,
-        narrow your display.
-      </p>
     </md-content>
   </md-sidenav>
 
   <md-content flex layout-padding>
     <div class="jtk-demo-main">
-      <div class="jtk-demo-canvas flowchart-demo jtk-surface">
-        <div class="window jtk-node" id="flowchartWindow1"><strong>1</strong><br/><br/></div>
+      <div class="jtk-demo-canvas flowchart-demo jtk-surface" id="canvas">
+        <!-- div class="window jtk-node" id="flowchartWindow1"><strong>1</strong><br/><br/></div>
         <div class="window jtk-node" id="flowchartWindow2"><strong>2</strong><br/><br/></div>
         <div class="window jtk-node" id="flowchartWindow3"><strong>3</strong><br/><br/></div>
-        <div class="window jtk-node" id="flowchartWindow4"><strong>4</strong><br/><br/></div>
+        <div class="window jtk-node" id="flowchartWindow4"><strong>4</strong><br/><br/></div -->
       </div>
     </div>
   </md-content>
