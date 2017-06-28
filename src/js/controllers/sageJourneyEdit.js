@@ -1,10 +1,19 @@
 (function (window, angular, undefined) {
 
     angular.module( 'coderControllers' ).controller( 'sageJourneyEditCtrl', [
-        '$scope', '$location', '$routeParams', '$log', '$mdDialog', 'Sage',
-        function( $scope, $location, $routeParams, $log, $mdDialog, Sage ) {
+        '$scope', '$location', '$routeParams', '$log', '$mdDialog', '$mdSidenav', 'Sage',
+        function( $scope, $location, $routeParams, $log, $mdDialog, $mdSidenav, Sage ) {
 
             $log.log( "loaded sageJourneyEditCtrl ..." );
+
+            $scope.leftClose = function () {
+                // Component lookup should always be available since we are not using `ng-if`
+                $log.log("IN HERE ...");
+                $mdSidenav('left').close()
+                    .then(function () {
+                        $log.debug("close LEFT is done");
+                    });
+            };
 
             jsPlumb.ready(function () {
 
