@@ -94,7 +94,7 @@
                     var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\">";
                     // html    += "<div class=\"outer-window-header\"> Window " + outerWindowNumber + "</div>";
                     var child_node = STATES[outerWindowNumber].child_nodes[0];
-                    html += "<div class=\"inner-window-action col-md-12\" id=\"innerflowchartWindow_" + child_node.id + "\">" + child_node.text + "</div>";
+                    html += "<div class=\"inner-window-action col-md-12\" id=\"innerflowchartWindow_" + child_node.id + "\" style=\"background-color: " + color + ";\" >" + child_node.text + "</div>";
                     html += "</div>";
                     $("#canvas").append(html);
 
