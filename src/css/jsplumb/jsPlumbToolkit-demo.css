@@ -22,9 +22,10 @@
 }
 
 .jtk-demo-canvas {
-    min-height:550px;
+    min-height:600px;
     border:1px solid #eee;
     background-color:white;
+    overflow: scroll;
 }
 
 .miniview {

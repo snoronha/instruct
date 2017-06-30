@@ -37,7 +37,7 @@
     values for the cursor - using a `grab` cursor where supported.
 */
 .jtk-surface {
-    overflow: hidden !important;
+    /* overflow: hidden !important; */
     position: relative;
     cursor: move;
     cursor: -moz-grab;

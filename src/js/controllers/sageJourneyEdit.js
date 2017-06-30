@@ -15,11 +15,11 @@
             };
 
             jsPlumb.ready(function () {
-
+                
                 var STATES = {};
                 var EDGES  = {};
                 var outerWindowNumber = 0;
-                
+
                 var instance = window.jsp = jsPlumb.getInstance({
                     // default drag options
                     DragOptions: { cursor: 'pointer', zIndex: 2000 },
@@ -39,6 +39,7 @@
                         } ],
                         [ "Label", {
                             location: 0.1,
+                            visible: false,
                             id: "label",
                             cssClass: "aLabel",
                             events:{
@@ -52,7 +53,7 @@
 
                 $scope.createCondition = function () {
                     //--- create new node with children for conditions ---//
-                    var numBoxes = 3;
+                    var numBoxes = 2;
                     var child_nodes = {};
                     for (var i = 0; i < numBoxes; i++) {
                         child_nodes[i] = { id: outerWindowNumber + "_" + i, text: "Insert condition here" };
@@ -65,29 +66,64 @@
                         "<div class=\"outer-window-header\"> Window " + outerWindowNumber + "</div>";
                     for (var i = 0; i < numBoxes; i++) {
                         var child_node = STATES[outerWindowNumber].child_nodes[i];
-                        html += "<div class=\"inner-window col-md-1\" id=\"innerflowchartWindow_" + child_node.id + "\">" + child_node.text + "</div>";
+                        html += "<div class=\"inner-window col-md-1\" id=\"innerflowchartWindow_" + child_node.id + "\" ng-click=\"updateText()\">" + child_node.text + "</div>";
                     }
                     html += "</div>";
-                    $log.log("Appending: ", html);
                     $("#canvas").append(html);
 
-                    $timeout(
-                        function() {
-                            //--- add endpoints for outerWindow and innerWindows ---//
-                            _addEndpoints("outerflowchartWindow_" + outerWindowNumber, [], ["TopCenter"]);
-                            for (var i = 0; i < numBoxes; i++) {
-                                var child_node = STATES[outerWindowNumber].child_nodes[i];
-                                _addEndpoints("innerflowchartWindow_" + child_node.id, ["BottomCenter"], []);
-                            }
+                    //--- add endpoints for outerWindow and innerWindows ---//
+                    _addEndpoints("outerflowchartWindow_" + outerWindowNumber, [], ["TopCenter"]);
+                    for (var i = 0; i < numBoxes; i++) {
+                        var child_node = STATES[outerWindowNumber].child_nodes[i];
+                        _addEndpoints("innerflowchartWindow_" + child_node.id, ["BottomCenter"], []);
+                    }
                             
-                            //--- force outer-windows to be draggable ---//
-                            instance.draggable(jsPlumb.getSelector(".flowchart-demo .outer-window"), { grid: [20, 20] }); 
-                        
-                            outerWindowNumber++;
-                        }, 100
-                    );
+                    //--- force outer-windows to be draggable ---//
+                    instance.draggable(jsPlumb.getSelector(".flowchart-demo .outer-window"), { grid: [20, 20] }); 
+                    outerWindowNumber++;
                 };
-                
+
+                $scope.createAction = function(color) {
+                    //--- create new action node ---//
+                    var child_nodes = {};
+                    child_nodes[0] = { id: "" + outerWindowNumber + "_" + 0, text: "Insert Action" };
+                    STATES[outerWindowNumber] = { type: 'Action', child_nodes: child_nodes };
+
+                    //--- create outerWindow + innerWindow[numBoxes] ---///
+                    var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
+                    var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\">";
+                    // html    += "<div class=\"outer-window-header\"> Window " + outerWindowNumber + "</div>";
+                    var child_node = STATES[outerWindowNumber].child_nodes[0];
+                    html += "<div class=\"inner-window-action col-md-12\" id=\"innerflowchartWindow_" + child_node.id + "\">" + child_node.text + "</div>";
+                    html += "</div>";
+                    $("#canvas").append(html);
+
+                    //--- add endpoints for outerWindow and innerWindows ---//
+                    _addEndpoints("outerflowchartWindow_" + outerWindowNumber, [], ["TopCenter"]);
+                    var child_node = STATES[outerWindowNumber].child_nodes[0];
+                    _addEndpoints("innerflowchartWindow_" + child_node.id, ["BottomCenter"], []);
+
+                    //--- force outer-windows to be draggable ---//
+                    instance.draggable(jsPlumb.getSelector(".flowchart-demo .outer-window"), { grid: [20, 20] });
+                    outerWindowNumber++;
+                };
+
+                //--- handlers ---//
+                $(document).on("click", ".inner-window, .inner-window-action", function(e) {
+                    var that = $(this);
+                    /*
+                    bootbox.prompt({
+                        title: "Update Text",
+                        value: that.html(),
+                        callback: function(text) {
+                            that.html(text);
+                            instance.repaintEverything();
+                        }
+                    });
+                    */
+                });
+                //--- end handlers ---//
+
                 var basicType = {
                     connector: "StateMachine",
                     paintStyle: { stroke: "red", strokeWidth: 4 },
@@ -290,5 +326,11 @@
             
 	    }
     ]);
+
+
+    angular.module( 'coderControllers' ).controller('JourneyFABCtrl', function() {
+        this.isOpen = false;
+        this.selectedMode = 'md-fling';
+    });
 
 })(window, window.angular);
