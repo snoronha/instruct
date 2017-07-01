@@ -1,8 +1,8 @@
 (function (window, angular, undefined) {
 
     angular.module( 'coderControllers' ).controller( 'sageJourneyEditCtrl', [
-        '$scope', '$location', '$routeParams', '$log', '$timeout', '$mdDialog', '$mdSidenav', 'Sage',
-        function( $scope, $location, $routeParams, $log, $timeout, $mdDialog, $mdSidenav, Sage ) {
+        '$scope', '$location', '$routeParams', '$log', '$timeout', '$mdDialog', '$mdSidenav', '$compile', '$document', 'Sage',
+        function( $scope, $location, $routeParams, $log, $timeout, $mdDialog, $mdSidenav, $compile, $document, Sage ) {
 
             $log.log( "loaded sageJourneyEditCtrl ..." );
 
@@ -13,7 +13,7 @@
                         $log.debug("close LEFT is done");
                     });
             };
-
+            
             jsPlumb.ready(function () {
                 
                 var STATES = {};
@@ -66,10 +66,12 @@
                         "<div class=\"outer-window-header\"> Window " + outerWindowNumber + "</div>";
                     for (var i = 0; i < numBoxes; i++) {
                         var child_node = STATES[outerWindowNumber].child_nodes[i];
-                        html += "<div class=\"inner-window col-md-1\" id=\"innerflowchartWindow_" + child_node.id + "\" ng-click=\"updateText()\">" + child_node.text + "</div>";
+                        html += "<div class=\"inner-window col-md-1\" id=\"innerflowchartWindow_" + child_node.id + "\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateText($event)\">" + child_node.text + "</span></div>";
                     }
                     html += "</div>";
-                    $("#canvas").append(html);
+                    var compiledHtml = $compile(html)($scope); 
+                    var canvas = angular.element($document[0].querySelector('#canvas'));
+                    canvas.append(compiledHtml);
 
                     //--- add endpoints for outerWindow and innerWindows ---//
                     _addEndpoints("outerflowchartWindow_" + outerWindowNumber, [], ["TopCenter"]);
@@ -92,12 +94,13 @@
                     //--- create outerWindow + innerWindow[numBoxes] ---///
                     var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
                     var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\">";
-                    // html    += "<div class=\"outer-window-header\"> Window " + outerWindowNumber + "</div>";
                     var child_node = STATES[outerWindowNumber].child_nodes[0];
-                    html += "<div class=\"inner-window-action col-md-12\" id=\"innerflowchartWindow_" + child_node.id + "\" style=\"background-color: " + color + ";\" >" + child_node.text + "</div>";
+                    html += "<div class=\"inner-window-action col-md-12\" id=\"innerflowchartWindow_" + child_node.id + "\" style=\"background-color: " + color + ";\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateText($event)\">" + child_node.text + "</span></div>";
                     html += "</div>";
-                    $("#canvas").append(html);
-
+                    var compiledHtml = $compile(html)($scope); 
+                    var canvas = angular.element($document[0].querySelector('#canvas'));
+                    canvas.append(compiledHtml);
+                    
                     //--- add endpoints for outerWindow and innerWindows ---//
                     _addEndpoints("outerflowchartWindow_" + outerWindowNumber, [], ["TopCenter"]);
                     var child_node = STATES[outerWindowNumber].child_nodes[0];
@@ -108,22 +111,33 @@
                     outerWindowNumber++;
                 };
 
-                //--- handlers ---//
-                $(document).on("click", ".inner-window, .inner-window-action", function(e) {
-                    var that = $(this);
-                    /*
-                    bootbox.prompt({
-                        title: "Update Text",
-                        value: that.html(),
-                        callback: function(text) {
-                            that.html(text);
-                            instance.repaintEverything();
-                        }
+                $scope.showTextPrompt = function(ev, elem) {
+                    // Appending dialog to document.body to cover sidenav in docs app
+                    var confirm = $mdDialog.prompt()
+                        .title('Update Label')
+                        // .textContent('Bowser is a common name.')
+                        .placeholder('Label')
+                        .ariaLabel('Label')
+                        .initialValue('')
+                        .targetEvent(ev)
+                        .ok('Update!')
+                        .cancel('Cancel');
+
+                    $mdDialog.show(confirm).then(function(result) {
+                        elem.html(result);
+                        instance.repaintEverything();
+                    }, function() {
+                        $log.log('No change');
                     });
-                    */
-                });
+                };
+
+                $scope.updateText = function(ev) {
+                    $scope.showTextPrompt(ev, angular.element(ev.target));
+                };
+
                 //--- end handlers ---//
 
+                /*
                 var basicType = {
                     connector: "StateMachine",
                     paintStyle: { stroke: "red", strokeWidth: 4 },
@@ -133,15 +147,17 @@
                     ]
                 };
                 instance.registerConnectionType("basic", basicType);
+                */
 
                 // this is the paint style for the connecting lines..
-                var connectorPaintStyle = {
-                    strokeWidth: 2,
-                    stroke: "#61B7CF",
-                    joinstyle: "round",
-                    outlineStroke: "white",
-                    outlineWidth: 2
-                },
+                var connectorPaintStyle =
+                    {
+                        strokeWidth: 2,
+                        stroke: "#61B7CF",
+                        joinstyle: "round",
+                        outlineStroke: "white",
+                        outlineWidth: 2
+                    },
                     // .. and this is the hover style.
                     connectorHoverStyle = {
                         strokeWidth: 3,
@@ -192,7 +208,7 @@
                     init = function (connection) {
                         connection.getOverlay("label").setLabel(connection.sourceId.substring(15) + "-" + connection.targetId.substring(15));
                     };
-
+                    
                 var _addEndpoints = function (toId, sourceAnchors, targetAnchors) {
                     for (var i = 0; i < sourceAnchors.length; i++) {
                         var sourceUUID = toId + sourceAnchors[i];
@@ -235,7 +251,7 @@
                             if (!EDGES[sourceNode.id][targetNode.id]) EDGES[sourceNode.id][targetNode.id] = {};
                             EDGES[sourceNode.id][targetNode.id] = {dom_source_id: sourceNode.dom_id, dom_target_id: targetNode.dom_id};
                         }
-                        console.log("connection - edges: ", EDGES);
+                        $log.log("connection - edges: ", EDGES);
                     });
 
                     //--- listen for detached connections; delete the edge ---//
@@ -296,7 +312,7 @@
                                 }
                             }
                         }
-                        console.log("moved - edges: ", EDGES);
+                        $log.log("moved - edges: ", EDGES);
                     });
                     
                     // make all the window divs draggable
