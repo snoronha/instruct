@@ -54,9 +54,19 @@ router.post( '/update_settings', function( req, res, next ) {
     var text = req.body;
     if ( ! text ) {
         console.log( "Invalid script: ", req.body );
-        return res.json( { error: 'Invalid script exec request', message: req.body } );
+        return res.json( { error: 'Invalid update settings request', message: req.body } );
     }
     var resp = Util.writeFile( JSON.stringify(text), "sage_settings.json" );
+    return res.send( resp );
+});
+
+router.post( '/update_state_diagram', function( req, res, next ) {
+    var state_diagram = req.body;
+    if ( ! state_diagram ) {
+        console.log( "Invalid script: ", req.body );
+        return res.json( { error: 'Invalid update state diagram request', message: req.body } );
+    }
+    var resp = Util.writeFile( JSON.stringify(state_diagram), "state_diagram.json" );
     return res.send( resp );
 });
 

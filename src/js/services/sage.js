@@ -39,6 +39,24 @@
             );
         };
 
+        this.updateStateDiagram = function( states, edges, success, failure ) {
+            var url     = '/v1/users/update_state_diagram';
+            $http({
+                method: 'POST',
+                url: url,
+                data: {states: states, edges: edges},
+                headers: {'Content-Type': 'application/json'}
+            }).success( function( data, status, headers, config ) {
+                if ( angular.isFunction( success )) {
+                    success( data );
+                }
+            }).error( function( data, status, headers, config ) {
+                $log.log( "Error Data: ", data );
+                if ( angular.isFunction( failure )) {
+                    failure( data );
+                }
+            });
+        };
     }]);
     
 })(window, window.angular);

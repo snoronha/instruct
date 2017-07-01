@@ -1,4 +1,5 @@
 api/node_modules
+api/problem_data
 build/
 index.html
 jsPlumb/

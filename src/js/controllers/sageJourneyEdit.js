@@ -5,14 +5,6 @@
         function( $scope, $location, $routeParams, $log, $timeout, $mdDialog, $mdSidenav, $compile, $document, Sage ) {
 
             $log.log( "loaded sageJourneyEditCtrl ..." );
-
-            $scope.leftClose = function () {
-                // Component lookup should always be available since we are not using `ng-if`
-                $mdSidenav('left').close()
-                    .then(function () {
-                        $log.debug("close LEFT is done");
-                    });
-            };
             
             jsPlumb.ready(function () {
                 
@@ -53,17 +45,17 @@
 
                 $scope.createCondition = function () {
                     //--- create new node with children for conditions ---//
+                    var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
                     var numBoxes = 2;
                     var child_nodes = {};
                     for (var i = 0; i < numBoxes; i++) {
-                        child_nodes[i] = { id: outerWindowNumber + "_" + i, text: "Insert condition here" };
+                        child_nodes[i] = { id: outerWindowNumber + "_" + i, text: "Insert condition" };
                     }
-                    STATES[outerWindowNumber] = { type: 'Condition', child_nodes: child_nodes };
+                    STATES[outerWindowNumber] = { type: 'Condition', child_nodes: child_nodes, dom_id: outerWindowElemId };
                     
                     //--- create outerWindow + innerWindow[numBoxes] ---///
-                    var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
                     var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\">" +
-                        "<div class=\"outer-window-header\"> Window " + outerWindowNumber + "</div>";
+                        "<div class=\"outer-window-header\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateText($event)\">Window " + outerWindowNumber + "</span></div>";
                     for (var i = 0; i < numBoxes; i++) {
                         var child_node = STATES[outerWindowNumber].child_nodes[i];
                         html += "<div class=\"inner-window col-md-1\" id=\"innerflowchartWindow_" + child_node.id + "\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateText($event)\">" + child_node.text + "</span></div>";
@@ -88,11 +80,12 @@
                 $scope.createAction = function(color) {
                     //--- create new action node ---//
                     var child_nodes = {};
+                    var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
                     child_nodes[0] = { id: "" + outerWindowNumber + "_" + 0, text: "Insert Action" };
-                    STATES[outerWindowNumber] = { type: 'Action', child_nodes: child_nodes };
+                    STATES[outerWindowNumber] = { type: 'Action', child_nodes: child_nodes,
+                                                  dom_id: outerWindowElemId, color: color };
 
                     //--- create outerWindow + innerWindow[numBoxes] ---///
-                    var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
                     var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\">";
                     var child_node = STATES[outerWindowNumber].child_nodes[0];
                     html += "<div class=\"inner-window-action col-md-12\" id=\"innerflowchartWindow_" + child_node.id + "\" style=\"background-color: " + color + ";\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateText($event)\">" + child_node.text + "</span></div>";
@@ -115,24 +108,54 @@
                     // Appending dialog to document.body to cover sidenav in docs app
                     var confirm = $mdDialog.prompt()
                         .title('Update Label')
-                        // .textContent('Bowser is a common name.')
+                        // .textContent('')
                         .placeholder('Label')
                         .ariaLabel('Label')
-                        .initialValue('')
+                        .initialValue(elem.html())
                         .targetEvent(ev)
                         .ok('Update!')
                         .cancel('Cancel');
 
-                    $mdDialog.show(confirm).then(function(result) {
-                        elem.html(result);
-                        instance.repaintEverything();
-                    }, function() {
-                        $log.log('No change');
-                    });
+                    $mdDialog.show(confirm).then(
+                        function(result) {
+                            elem.html(result);
+                            instance.repaintEverything();
+                        },
+                        function() {
+                            $log.log('No change');
+                        }
+                    );
                 };
 
                 $scope.updateText = function(ev) {
                     $scope.showTextPrompt(ev, angular.element(ev.target));
+                };
+
+                $scope.saveStateDiagram = function() {
+                    var text = '';
+                    for( var sourceNode in EDGES ) {
+                        for ( var targetNode in EDGES[sourceNode] ) {
+                            var edgeInfo = EDGES[sourceNode][targetNode];
+                            var sourceText = $("#" + edgeInfo.dom_source_id).text();
+                            var targetText = $("#" + edgeInfo.dom_target_id).text();
+                            text += sourceText + " ---> " + targetText + "</br>";
+                        }
+                        text += "-----------------------------<br>";
+                    }
+                    angular.forEach(STATES, function(state, index) {
+                        var elem = angular.element($document[0].querySelector('#' + state.dom_id));
+                        state.x = elem.prop('offsetLeft') || 0;
+                        state.y = elem.prop('offsetTop') || 0;
+                    });
+                    Sage.updateStateDiagram( 
+                        STATES, EDGES, 
+                        function( data ) {
+                            $log.log( "Updated: ", data );
+                        },
+                        function( data ) {
+                            $log.log( "Error updating state diagram: ", data );
+                        }
+                    );
                 };
 
                 //--- end handlers ---//
