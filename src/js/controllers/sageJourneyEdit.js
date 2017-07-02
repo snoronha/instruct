@@ -12,6 +12,22 @@
                 var EDGES  = {};
                 var outerWindowNumber = 0;
 
+                //--- On load, get state diagram if it exists ---//
+                Sage.getStateDiagram(
+                    function( response ) {
+                        if ('states' in response.data) {
+                            STATES = response.data.states;
+                        }
+                        if ('edges' in response.data) {
+                            EDGES  = response.data.edges;
+                        }
+                        $scope.restoreStateDiagram(STATES, EDGES);
+                    },
+                    function( data ) {
+                        $log.log( "Error retrieving state diagram", data );
+                    }
+                );
+
                 var instance = window.jsp = jsPlumb.getInstance({
                     // default drag options
                     DragOptions: { cursor: 'pointer', zIndex: 2000 },
@@ -42,27 +58,21 @@
                     Container: "canvas"
                 });
 
-
                 $scope.createCondition = function () {
                     //--- create new node with children for conditions ---//
                     var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
                     var numBoxes = 2;
-                    var child_nodes = {};
+                    var child_nodes = [];
                     for (var i = 0; i < numBoxes; i++) {
                         child_nodes[i] = { id: outerWindowNumber + "_" + i, text: "Insert condition" };
                     }
-                    STATES[outerWindowNumber] = { type: 'Condition', child_nodes: child_nodes, dom_id: outerWindowElemId };
+                    STATES[outerWindowNumber] = { type: 'Condition', child_nodes: child_nodes, text: "Insert Condition",
+                                                  dom_id: outerWindowElemId };
                     
                     //--- create outerWindow + innerWindow[numBoxes] ---///
-                    var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\">" +
-                        "<div class=\"outer-window-header\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateText($event)\">Window " + outerWindowNumber + "</span></div>";
-                    for (var i = 0; i < numBoxes; i++) {
-                        var child_node = STATES[outerWindowNumber].child_nodes[i];
-                        html += "<div class=\"inner-window col-md-1\" id=\"innerflowchartWindow_" + child_node.id + "\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateText($event)\">" + child_node.text + "</span></div>";
-                    }
-                    html += "</div>";
-                    var compiledHtml = $compile(html)($scope); 
-                    var canvas = angular.element($document[0].querySelector('#canvas'));
+                    var html         = Sage.getConditionTemplate(outerWindowElemId, STATES[outerWindowNumber], numBoxes);
+                    var compiledHtml = $compile(html)($scope);
+                    var canvas       = angular.element($document[0].querySelector('#canvas'));
                     canvas.append(compiledHtml);
 
                     //--- add endpoints for outerWindow and innerWindows ---//
@@ -79,19 +89,16 @@
 
                 $scope.createAction = function(color) {
                     //--- create new action node ---//
-                    var child_nodes = {};
+                    var child_nodes = [];
                     var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
                     child_nodes[0] = { id: "" + outerWindowNumber + "_" + 0, text: "Insert Action" };
-                    STATES[outerWindowNumber] = { type: 'Action', child_nodes: child_nodes,
+                    STATES[outerWindowNumber] = { type: 'Action', child_nodes: child_nodes, text: "Insert Action",
                                                   dom_id: outerWindowElemId, color: color };
 
-                    //--- create outerWindow + innerWindow[numBoxes] ---///
-                    var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\">";
-                    var child_node = STATES[outerWindowNumber].child_nodes[0];
-                    html += "<div class=\"inner-window-action col-md-12\" id=\"innerflowchartWindow_" + child_node.id + "\" style=\"background-color: " + color + ";\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateText($event)\">" + child_node.text + "</span></div>";
-                    html += "</div>";
+                    //--- create outerWindow + innerWindow[numBoxes] ---//
+                    var html         = Sage.getActionTemplate(outerWindowElemId, STATES[outerWindowNumber], color);
                     var compiledHtml = $compile(html)($scope); 
-                    var canvas = angular.element($document[0].querySelector('#canvas'));
+                    var canvas       = angular.element($document[0].querySelector('#canvas'));
                     canvas.append(compiledHtml);
                     
                     //--- add endpoints for outerWindow and innerWindows ---//
@@ -119,6 +126,23 @@
                     $mdDialog.show(confirm).then(
                         function(result) {
                             elem.html(result);
+                            // Update text value in STATES
+                            elemid = elem.attr('data-id');
+                            var state;
+                            var matches = Sage.getInnerAndOuterMatches(elemid);
+                            if (matches.innerMatch) {
+                                // update inner (child) node
+                                var outerState = matches.innerMatch[1], innerState = matches.innerMatch[2];
+                                if (outerState in STATES && innerState in STATES[outerState].child_nodes) {
+                                    STATES[outerState].child_nodes[innerState].text = result;
+                                }
+                            } else if (matches.outerMatch) {
+                                // update outer node
+                                state = matches.outerMatch[1];
+                                if (state && state in STATES) {
+                                    STATES[state].text = result;
+                                }
+                            }
                             instance.repaintEverything();
                         },
                         function() {
@@ -131,17 +155,44 @@
                     $scope.showTextPrompt(ev, angular.element(ev.target));
                 };
 
-                $scope.saveStateDiagram = function() {
-                    var text = '';
-                    for( var sourceNode in EDGES ) {
-                        for ( var targetNode in EDGES[sourceNode] ) {
-                            var edgeInfo = EDGES[sourceNode][targetNode];
-                            var sourceText = $("#" + edgeInfo.dom_source_id).text();
-                            var targetText = $("#" + edgeInfo.dom_target_id).text();
-                            text += sourceText + " ---> " + targetText + "</br>";
+                $scope.restoreStateDiagram = function(states, edges) {
+                    angular.forEach(states, function(state, winNumber) {
+                        var outerWindowElemId = "outerflowchartWindow_" + winNumber;
+                        var html;
+                        if (state.type == 'Condition') {
+                            var numBoxes = state.child_nodes.length;
+                            html = Sage.getConditionTemplate(outerWindowElemId, states[winNumber], numBoxes);
+                        } else if (state.type == 'Action') {
+                            html = Sage.getActionTemplate(outerWindowElemId, states[winNumber], state.color);
                         }
-                        text += "-----------------------------<br>";
-                    }
+                        var compiledHtml = $compile(html)($scope); 
+                        var canvas       = angular.element($document[0].querySelector('#canvas'));
+                        canvas.append(compiledHtml);
+                        
+                        //--- add endpoints for outerWindow and innerWindows ---//
+                        _addEndpoints("outerflowchartWindow_" + winNumber, [], ["TopCenter"]);
+                        if (state.type == 'Condition') {
+                            for (var i = 0; i < numBoxes; i++) {
+                                var child_node = states[winNumber].child_nodes[i];
+                                _addEndpoints("innerflowchartWindow_" + child_node.id, ["BottomCenter"], []);
+                            }
+                        } else if (state.type == 'Action') {
+                            var child_node = states[winNumber].child_nodes[0]; 
+                            _addEndpoints("innerflowchartWindow_" + child_node.id, ["BottomCenter"], []);
+                        }
+                        //--- force outer-windows to be draggable ---//
+                        instance.draggable(jsPlumb.getSelector(".flowchart-demo .outer-window"), { grid: [20, 20] });
+                    });
+                    angular.forEach(edges, function(outerBlob, sourceNodeId) {
+                        angular.forEach(outerBlob, function(edge, targetNodeId) {
+                            var srcEndpt = edge.dom_source_id + "BottomCenter";
+                            var tgtEndpt = edge.dom_target_id + "TopCenter";
+                            instance.connect({uuids:[srcEndpt, tgtEndpt]});
+                        });
+                    });
+                };
+                
+                $scope.saveStateDiagram = function() {
                     angular.forEach(STATES, function(state, index) {
                         var elem = angular.element($document[0].querySelector('#' + state.dom_id));
                         state.x = elem.prop('offsetLeft') || 0;
@@ -235,9 +286,7 @@
                 var _addEndpoints = function (toId, sourceAnchors, targetAnchors) {
                     for (var i = 0; i < sourceAnchors.length; i++) {
                         var sourceUUID = toId + sourceAnchors[i];
-                        instance.addEndpoint(toId, sourceEndpoint, {
-                            anchor: sourceAnchors[i], uuid: sourceUUID
-                        });
+                        instance.addEndpoint(toId, sourceEndpoint, { anchor: sourceAnchors[i], uuid: sourceUUID });
                     }
                     for (var j = 0; j < targetAnchors.length; j++) {
                         var targetUUID = toId + targetAnchors[j];
@@ -252,20 +301,18 @@
                     instance.bind("connection", function (connInfo, originalEvent) {
                         init(connInfo.connection);
                         var sourceNode, targetNode, innerMatch, outerMatch;
-                        innerMatch = connInfo.sourceId.match(/Window_(\d+)_(\d+)$/);
-                        outerMatch = connInfo.sourceId.match(/Window_(\d+)$/);
-                        if (innerMatch) {
-                            sourceNode = { id: innerMatch[1] + '_' + innerMatch[2], dom_id: connInfo.sourceId };
-                        } else if (outerMatch) {
-                            sourceNode = { id: outerMatch[1], dom_id: connInfo.sourceId };
+                        var matches = Sage.getInnerAndOuterMatches(connInfo.sourceId);
+                        if (matches.innerMatch) {
+                            sourceNode = { id: matches.innerMatch[1] + '_' + matches.innerMatch[2], dom_id: connInfo.sourceId };
+                        } else if (matches.outerMatch) {
+                            sourceNode = { id: matches.outerMatch[1], dom_id: connInfo.sourceId };
                         }
 
-                        innerMatch = connInfo.targetId.match(/Window_(\d+)_(\d+)$/);
-                        outerMatch = connInfo.targetId.match(/Window_(\d+)$/);
-                        if (innerMatch) {
-                            targetNode = { id: innerMatch[1] + '_' + innerMatch[2], dom_id: connInfo.targetId };
-                        } else if (outerMatch) {
-                            targetNode = { id: outerMatch[1], dom_id: connInfo.targetId };
+                        matches = Sage.getInnerAndOuterMatches(connInfo.targetId);
+                        if (matches.innerMatch) {
+                            targetNode = { id: matches.innerMatch[1] + '_' + matches.innerMatch[2], dom_id: connInfo.targetId };
+                        } else if (matches.outerMatch) {
+                            targetNode = { id: matches.outerMatch[1], dom_id: connInfo.targetId };
                         }
 
                         //--- create an edge ---//
@@ -274,7 +321,6 @@
                             if (!EDGES[sourceNode.id][targetNode.id]) EDGES[sourceNode.id][targetNode.id] = {};
                             EDGES[sourceNode.id][targetNode.id] = {dom_source_id: sourceNode.dom_id, dom_target_id: targetNode.dom_id};
                         }
-                        $log.log("connection - edges: ", EDGES);
                     });
 
                     //--- listen for detached connections; delete the edge ---//
@@ -349,7 +395,7 @@
                     });
 
                     instance.bind("connectionDrag", function (connection) {
-                        // $log.log("connection " + connection.id + " is being dragged. suspendedElement is ", connection.suspendedElement,
+                        // $log.log("connection " + connection.id + " being dragged. suspendedElement is ", connection.suspendedElement,
                         // " of type ", connection.suspendedElementType);
                     });
 

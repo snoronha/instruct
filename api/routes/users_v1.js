@@ -44,7 +44,6 @@ router.get( '/', function( req, res, next ) {
 });
 
 //--------------- SAGE Temporary Home --------------//
-// GET problem by problem_number
 router.get( '/get_settings', function( req, res, next ) {
     var settings = JSON.parse( Util.readFile( "sage_settings.json" ));
     return res.send( settings );
@@ -58,6 +57,11 @@ router.post( '/update_settings', function( req, res, next ) {
     }
     var resp = Util.writeFile( JSON.stringify(text), "sage_settings.json" );
     return res.send( resp );
+});
+
+router.get( '/get_state_diagram', function( req, res, next ) {
+    var settings = JSON.parse( Util.readFile( "state_diagram.json" ));
+    return res.send( settings );
 });
 
 router.post( '/update_state_diagram', function( req, res, next ) {
