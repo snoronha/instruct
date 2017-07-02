@@ -5,7 +5,8 @@
         function( $scope, $location, $routeParams, $log, $timeout, $mdDialog, $mdSidenav, $compile, $document, Sage ) {
 
             $log.log( "loaded sageJourneyEditCtrl ..." );
-            
+            $scope.isLoading = false; // used for showing circular progress
+
             jsPlumb.ready(function () {
                 
                 var STATES = {};
@@ -64,7 +65,8 @@
                     var numBoxes = 2;
                     var child_nodes = [];
                     for (var i = 0; i < numBoxes; i++) {
-                        child_nodes[i] = { id: outerWindowNumber + "_" + i, text: "Insert condition" };
+                        var innerWindowElemId = "innerflowchartWindow_" + outerWindowNumber + "_" + i;
+                        child_nodes[i] = { id: outerWindowNumber + "_" + i, text: "Insert condition", dom_id: innerWindowElemId };
                     }
                     STATES[outerWindowNumber] = { type: 'Condition', child_nodes: child_nodes, text: "Insert Condition",
                                                   dom_id: outerWindowElemId };
@@ -91,7 +93,8 @@
                     //--- create new action node ---//
                     var child_nodes = [];
                     var outerWindowElemId = "outerflowchartWindow_" + outerWindowNumber;
-                    child_nodes[0] = { id: "" + outerWindowNumber + "_" + 0, text: "Insert Action" };
+                    var innerWindowElemId = "innerflowchartWindow_" + outerWindowNumber + "_" + 0 ;
+                    child_nodes[0] = { id: "" + outerWindowNumber + "_" + 0, text: "Insert Action", dom_id: innerWindowElemId };
                     STATES[outerWindowNumber] = { type: 'Action', child_nodes: child_nodes, text: "Insert Action",
                                                   dom_id: outerWindowElemId, color: color };
 
@@ -111,11 +114,51 @@
                     outerWindowNumber++;
                 };
 
-                $scope.showTextPrompt = function(ev, elem) {
+                $scope.confirmDeleteState = function(ev, elem) {
+                    // Appending dialog to document.body to cover sidenav in docs app
+                    var elemid   = elem.attr('data-id');
+                    var confirm  = $mdDialog.confirm()
+                        .title('Delete this state?')
+                        .textContent('Deleting this states gets rid of all its connections as well. Are you sure?')
+                        .ariaLabel('Delete State')
+                        .targetEvent(ev)
+                        .ok('DELETE!')
+                        .cancel('Cancel');
+                    
+                    $mdDialog.show(confirm).then(function() {
+                        $log.log("Deleting " + elemid);
+                        // Detach connection from node
+                        instance.detachAllConnections(elemid);
+                        instance.removeAllEndpoints(elemid);
+                        // Detach connection from child_node(s) as well
+                        var matches     = Sage.getInnerAndOuterMatches(elemid);
+                        var numid       = null;
+                        if (matches.innerMatch) {
+                            numid       = matches.innerMatch[1];
+                        } else if (matches.outerMatch) {
+                            numid       = matches.outerMatch[1];
+                        }
+                        if (numid in STATES) {
+                            angular.forEach(STATES[numid].child_nodes, function(child_node, child_id) {
+                                instance.detachAllConnections(child_node.dom_id);
+                                instance.removeAllEndpoints(child_node.dom_id);
+                            });
+                        }
+                        instance.detach(elemid);
+                        angular.element($document[0].querySelector('#' + elemid)).remove();
+
+                        // Delete data from STATES and EDGES (TBD)
+
+                        instance.repaintEverything();
+                    }, function() {
+                        $log.log("Delete cancelled");
+                    });
+                };
+                
+                $scope.confirmLabelChange = function(ev, elem) {
                     // Appending dialog to document.body to cover sidenav in docs app
                     var confirm = $mdDialog.prompt()
                         .title('Update Label')
-                        // .textContent('')
                         .placeholder('Label')
                         .ariaLabel('Label')
                         .initialValue(elem.html())
@@ -151,8 +194,12 @@
                     );
                 };
 
-                $scope.updateText = function(ev) {
-                    $scope.showTextPrompt(ev, angular.element(ev.target));
+                $scope.updateLabel = function(ev) {
+                    $scope.confirmLabelChange(ev, angular.element(ev.target));
+                };
+
+                $scope.deleteState = function(ev) {
+                    $scope.confirmDeleteState(ev, angular.element(ev.target));
                 };
 
                 $scope.restoreStateDiagram = function(states, edges) {
@@ -193,6 +240,7 @@
                 };
                 
                 $scope.saveStateDiagram = function() {
+                    $scope.isLoading = true;
                     angular.forEach(STATES, function(state, index) {
                         var elem = angular.element($document[0].querySelector('#' + state.dom_id));
                         state.x = elem.prop('offsetLeft') || 0;
@@ -202,16 +250,19 @@
                         STATES, EDGES, 
                         function( data ) {
                             $log.log( "Updated: ", data );
+                            $timeout(function() {
+                                $scope.isLoading = false;
+                            }, 1000);
                         },
                         function( data ) {
                             $log.log( "Error updating state diagram: ", data );
+                            $scope.isLoading = false;
                         }
                     );
                 };
 
                 //--- end handlers ---//
 
-                /*
                 var basicType = {
                     connector: "StateMachine",
                     paintStyle: { stroke: "red", strokeWidth: 4 },
@@ -221,7 +272,6 @@
                     ]
                 };
                 instance.registerConnectionType("basic", basicType);
-                */
 
                 // this is the paint style for the connecting lines..
                 var connectorPaintStyle =
@@ -369,7 +419,7 @@
                         outerMatch = connInfo.originalTargetId.match(/Window_(\d+)$/);
                         if (innerMatch) {
                             targetNode = { id: innerMatch[1] + '_' + innerMatch[2] };
-                        } else if (outerMatch) {
+                        } else if (matches.outerMatch) {
                             targetNode = { id: outerMatch[1] };
                         }
 

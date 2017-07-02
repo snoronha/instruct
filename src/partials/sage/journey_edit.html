@@ -27,7 +27,8 @@
     <div class="jtk-demo-main">
 
       <!-- FAB Speed Dial Control -->
-      <div ng-controller="JourneyFABCtrl as fabctrl" layout="column" style="position: absolute; right: 3%; top: 5%;" ng-cloak>
+      <div ng-controller="JourneyFABCtrl as fabctrl" layout="column"
+           style="position: absolute; right: 3%; top: 5%;" ng-cloak>
         <div class="lock-size" layout="row">
           <md-fab-speed-dial md-open="fabctrl.isOpen" md-direction="down" ng-class="fabctrl.selectedMode">
             <md-fab-trigger>
@@ -59,10 +60,15 @@
         </div>
       </div>
 
+
       <!-- Canvas for flowchart -->
       <div class="jtk-demo-canvas flowchart-demo jtk-surface" id="canvas"></div>
 
     </div>
+    <div layout="row" layout-sm="column" layout-align="space-around" style="position: absolute; right: 48%; top: 30%;">
+      <md-progress-circular md-mode="indeterminate" ng-show="isLoading" md-diameter="80"></md-progress-circular>
+    </div>
+
   </md-content>
 
 </section>
