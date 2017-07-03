@@ -99,6 +99,7 @@
         this.getConditionTemplate = function(outerWindowElemId, state, numBoxes) {
             var x = state.x || 0, y = state.y || 0;
             var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\" style=\"left: " + x + "px; top: " + y + "px;\">";
+            html    += "<i class=\"material-icons\" style=\"font-size: 18px; position: absolute; right: -5px; top: -5px; z-index: 1000;\" ng-click=\"deleteState($event)\" data-id=\"" + outerWindowElemId + "\">cancel</i>";
             html    += "<div class=\"outer-window-header\" layout=\"row\" layout-align=\"center center\"><span ng-click=\"updateLabel($event)\" data-id=\"" + outerWindowElemId + "\">" + state.text + "</span></div>";
             for (var i = 0; i < numBoxes; i++) {
                 var child_node = state.child_nodes[i];
