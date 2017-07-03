@@ -86,6 +86,16 @@
             return { innerMatch: innerMatch, outerMatch: outerMatch };
         };
 
+        this.getMaxStateId = function(states)  {
+            var maxId = -1;
+            angular.forEach(states, function(state, id) {
+                if (id > maxId) {
+                    maxId = id;
+                }
+            });
+            return maxId;
+        };
+
         this.getConditionTemplate = function(outerWindowElemId, state, numBoxes) {
             var x = state.x || 0, y = state.y || 0;
             var html = "<div class=\"outer-window\" id=\"" + outerWindowElemId + "\" style=\"left: " + x + "px; top: " + y + "px;\">";

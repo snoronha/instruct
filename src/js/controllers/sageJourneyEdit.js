@@ -23,6 +23,7 @@
                             EDGES  = response.data.edges;
                         }
                         $scope.restoreStateDiagram(STATES, EDGES);
+                        outerWindowNumber = Sage.getMaxStateId(STATES) + 1;
                     },
                     function( data ) {
                         $log.log( "Error retrieving state diagram", data );
@@ -147,7 +148,12 @@
                         instance.detach(elemid);
                         angular.element($document[0].querySelector('#' + elemid)).remove();
 
-                        // Delete data from STATES and EDGES (TBD)
+                        // Delete state from STATES (connectionDetached method takes of deleting edges)
+                        angular.forEach(STATES, function(state, idx) {
+                            if (elemid == state.dom_id) {
+                                delete STATES[idx];
+                            }
+                        });
 
                         instance.repaintEverything();
                     }, function() {
