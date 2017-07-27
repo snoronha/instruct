@@ -329,7 +329,7 @@ var util     = {
             javascript: { interpreted: true, interpreter: 'node', extension: 'js' },
             php:        { interpreted: true, interpreter: 'php', extension: 'php' },
             ruby:       { interpreted: true, interpreter: 'ruby', extension: 'rb' },
-            python:     { interpreted: true, interpreter: 'python', extension: 'rb' },
+            python:     { interpreted: true, interpreter: 'python', extension: 'py' },
             'c++':      { interpreted: false, compiler: 'g++', compileArgs: ["-Wall", "-std=gnu++11", "-pthread"],
                           srcExtension: 'cpp', execExtension: 'out' },
         };
